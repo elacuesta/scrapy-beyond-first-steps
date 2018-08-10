@@ -18,6 +18,10 @@ LOG_LEVEL = 'INFO'
 
 FEED_EXPORT_INDENT = 4
 FEED_EXPORT_ENCODING = 'utf8'
+FEED_EXPORTERS = {
+    'yaml': 'scrapy_yaml_item_exporter.YAMLItemExporter',
+    'yml': 'scrapy_yaml_item_exporter.YAMLItemExporter',
+}
 
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0'
 
