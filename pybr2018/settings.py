@@ -22,3 +22,5 @@ FEED_EXPORT_ENCODING = 'utf8'
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0'
 
 ROBOTSTXT_OBEY = False
+
+CONCURRENT_REQUESTS = 32

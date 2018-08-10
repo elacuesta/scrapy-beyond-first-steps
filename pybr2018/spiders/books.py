@@ -4,11 +4,9 @@ import scrapy
 
 class BaseBooksSpider(scrapy.Spider):
     """
-    Common methods to navigate the site and extract book data
+    Abstract spider with common methods to extract links and book data
     """
-
-    def start_requests(self):
-        yield scrapy.Request('http://books.toscrape.com', callback=self.extract_book_urls)
+    start_urls = ['http://books.toscrape.com']
 
     def extract_book_urls(self, response):
         return map(response.urljoin, response.css('article.product_pod h3 a::attr(href)').getall())
@@ -19,7 +17,6 @@ class BaseBooksSpider(scrapy.Spider):
             'url': response.url,
             'title': response.css('h1::text').get(),
             'price': response.css('p.price_color::text').get(),
-            'image_url': response.urljoin(response.css('div.thumbnail img::attr(src)').get()),
             'rating': response.css('p.star-rating::attr(class)').get('').split(' ')[-1],
         }
 
@@ -30,8 +27,8 @@ class ParallelBooksSpider(BaseBooksSpider):
     """
     name = 'books-parallel'
 
-    def extract_book_urls(self, response):
-        for book_url in super().extract_book_urls(response):
+    def parse(self, response):
+        for book_url in self.extract_book_urls(response):
             self.logger.info('Scheduling request for %s', book_url)
             yield scrapy.Request(book_url, callback=self.parse_book)
 
@@ -57,6 +54,6 @@ class SequentialBooksSpider(BaseBooksSpider):
             request = scrapy.Request(book_url, callback=self.parse_book)
             self.crawler.engine.crawl(request, self)
 
-    def extract_book_urls(self, response):
-        for link in super().extract_book_urls(response):
+    def parse(self, response):
+        for link in self.extract_book_urls(response):
             self.pending_book_urls.add(link)
