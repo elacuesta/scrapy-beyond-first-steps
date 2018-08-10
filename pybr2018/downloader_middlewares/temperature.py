@@ -32,21 +32,19 @@ class TemperatureConversionMiddleware:
         Create the zeep Client using the WSDL from the spider.
         """
         self.client = ZeepClient('{}?WSDL'.format(spider.url))
-        self.binding = list(self.client.wsdl.bindings.values())[0]
+        self.operations = list(self.client.wsdl.bindings.values())[0]
 
     def process_request(self, request, spider):
         if request.meta.get('zeep_ignore'):
             return None  # process normally
         else:
             operation_name = request.meta['operation_name']
+            operation = self.operations.get(operation_name)
             self.logger.info('Creating request for "%s" operation', operation_name)
-            operation = self.binding.get(operation_name)
             source_unit, _ = operation_name.split('To')
             payload = dict()
             payload[source_unit] = request.meta['source_value']
-            body = self.client.create_message(service=self.client.service,
-                                              operation_name=operation_name,
-                                              **payload)
+            body = self.client.create_message(self.client.service, operation_name, **payload)
             return Request(
                 url=request.url,
                 method='POST',
@@ -56,13 +54,13 @@ class TemperatureConversionMiddleware:
                 },
                 body=etree.tostring(body),
                 dont_filter=True,
-                meta={'zeep_ignore': True, 'handle_httpstatus_all': True, **request.meta},
+                meta={'zeep_ignore': True, **request.meta},
             )
 
     def process_response(self, request, response, spider):
         operation_name = request.meta['operation_name']
-        operation = self.binding.get(operation_name)
+        operation = self.operations.get(operation_name)
         self.logger.info('Processing response for "%s" operation', operation_name)
         _response = _FakeResponse(response.status, response.body, response.headers)
-        request.meta['result'] = self.binding.process_reply(self.client, operation, _response)
+        request.meta['result'] = self.operations.process_reply(self.client, operation, _response)
         return response
