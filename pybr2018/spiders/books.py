@@ -2,22 +2,29 @@
 import scrapy
 
 
+numeric_ratings = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5}
+
+
 class BaseBooksSpider(scrapy.Spider):
     """
     Abstract spider with common methods to extract links and book data
     """
     start_urls = ['http://books.toscrape.com']
+    # custom_settings = {
+    #     'ITEM_PIPELINES': {'pybr2018.pipelines.AveragePipeline': 100},
+    # }
 
     def extract_book_urls(self, response):
         return map(response.urljoin, response.css('article.product_pod h3 a::attr(href)').getall())
 
     def parse_book(self, response):
         self.logger.info('Extracting book from %s', response.url)
+        rating = response.css('p.star-rating::attr(class)').get('').split(' ')[-1]
         return {
             'url': response.url,
             'title': response.css('h1::text').get(),
             'price': response.css('p.price_color::text').get(),
-            'rating': response.css('p.star-rating::attr(class)').get('').split(' ')[-1],
+            'rating': numeric_ratings.get(rating.lower()),
         }
 
 
