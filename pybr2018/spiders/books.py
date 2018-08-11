@@ -5,10 +5,11 @@ import scrapy
 numeric_ratings = {'one': 1, 'two': 2, 'three': 3, 'four': 4, 'five': 5}
 
 
-class BaseBooksSpider(scrapy.Spider):
+class BooksSpider(scrapy.Spider):
     """
-    Abstract spider with common methods to extract links and book data
+    Base spider with common methods to extract links and book data
     """
+    name = 'books'
     start_urls = ['http://books.toscrape.com']
     # custom_settings = {
     #     'ITEM_PIPELINES': {'pybr2018.pipelines.AveragePipeline': 100},
@@ -16,6 +17,11 @@ class BaseBooksSpider(scrapy.Spider):
 
     def extract_book_urls(self, response):
         return map(response.urljoin, response.css('article.product_pod h3 a::attr(href)').getall())
+
+    def parse(self, response):
+        for book_url in self.extract_book_urls(response):
+            self.logger.info('Scheduling request for %s', book_url)
+            yield scrapy.Request(book_url, callback=self.parse_book)
 
     def parse_book(self, response):
         self.logger.info('Extracting book from %s', response.url)
@@ -28,19 +34,7 @@ class BaseBooksSpider(scrapy.Spider):
         }
 
 
-class ParallelBooksSpider(BaseBooksSpider):
-    """
-    A spider that schedules and processes requests/responses in parallel
-    """
-    name = 'books-parallel'
-
-    def parse(self, response):
-        for book_url in self.extract_book_urls(response):
-            self.logger.info('Scheduling request for %s', book_url)
-            yield scrapy.Request(book_url, callback=self.parse_book)
-
-
-class SequentialBooksSpider(BaseBooksSpider):
+class SequentialBooksSpider(BooksSpider):
     """
     A spider that schedules and processes requests/responses sequentially
     """
