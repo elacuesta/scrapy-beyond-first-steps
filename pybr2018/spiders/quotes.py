@@ -1,5 +1,7 @@
 import scrapy
 
+from pybr2018.items import QuoteItemLoader
+
 
 class QuotesSpider(scrapy.Spider):
     """
@@ -21,9 +23,9 @@ class QuotesSpider(scrapy.Spider):
 
     def parse(self, response):
         for quote in response.css('div.quote'):
-            yield {
-                'url': response.url,
-                'author': quote.css('small.author::text').get(),
-                'text': quote.css('span.text::text').get(),
-                'tags': quote.css('meta.keywords::attr(content)').get().split(','),
-            }
+            loader = QuoteItemLoader(selector=quote)
+            loader.add_value('url', response.url)
+            loader.add_css('author', 'small.author::text')
+            loader.add_css('text', 'span.text::text')
+            loader.add_css('tags', 'meta.keywords::attr(content)')
+            yield loader.load_item()

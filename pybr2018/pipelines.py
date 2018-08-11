@@ -36,6 +36,12 @@ class ValidateQuotesPipeline:
         'title': 'Quote',
         'type': 'object',
         'properties': {
+            'url': {
+                'type': 'string',
+            },
+            'author': {
+                'type': 'string',
+            },
             'text': {
                 'type': 'string',
                 'maxLength': 200
@@ -46,15 +52,16 @@ class ValidateQuotesPipeline:
                     'type': 'string'
                 },
                 'minItems': 1,
-                'maxItems': 4,
+                'maxItems': 5,
             }
         },
         'additionalProperties': True,
+        'required': ['url', 'author', 'text', 'tags'],
     }
 
     def process_item(self, item, spider):
         try:
-            jsonschema.validate(item, self.schema)
+            jsonschema.validate(dict(item), self.schema)
         except jsonschema.ValidationError as ex:
             raise DropItem(ex.message)
         else:
