@@ -38,7 +38,7 @@ class ValidateQuotesPipeline:
         'properties': {
             'text': {
                 'type': 'string',
-                'maxLength': 120
+                'maxLength': 200
             },
             'tags': {
                 'type': 'array',
@@ -46,7 +46,7 @@ class ValidateQuotesPipeline:
                     'type': 'string'
                 },
                 'minItems': 1,
-                'maxItems': 3,
+                'maxItems': 4,
             }
         },
         'additionalProperties': True,

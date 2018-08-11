@@ -7,9 +7,9 @@ class QuotesSpider(scrapy.Spider):
     """
     name = 'quotes'
     start_urls = [
-        'http://localhost:8000/Quotes.html',         # raw HTML
-        'http://localhost:8000/Quotes.b64.txt',      # b64 encoded HTML
-        'http://localhost:8000/Quotes.b64.txt.zip',  # b64 encoded HTML, zipped
+        'http://localhost:8000/Quotes.html',          # raw HTML
+        'http://localhost:8000/Quotes2.b64.txt',      # b64 encoded HTML
+        'http://localhost:8000/Quotes3.b64.txt.zip',  # b64 encoded HTML, zipped
     ]
     custom_settings = {
         'DOWNLOADER_MIDDLEWARES': {
