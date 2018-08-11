@@ -15,7 +15,8 @@ class QuotesSpider(scrapy.Spider):
         'DOWNLOADER_MIDDLEWARES': {
            'pybr2018.downloader_middlewares.quotes.DecompressZipMiddleware': 543,
            'pybr2018.downloader_middlewares.quotes.DecodeBase64Middleware': 542,
-        }
+        },
+        # 'ITEM_PIPELINES': {'pybr2018.pipelines.ValidateQuotesPipeline': 100},
     }
 
     def parse(self, response):

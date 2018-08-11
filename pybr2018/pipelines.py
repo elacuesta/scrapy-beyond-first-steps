@@ -1,6 +1,9 @@
 import re
 import logging
 
+from scrapy.exceptions import DropItem
+import jsonschema
+
 
 class AveragePipeline:
 
@@ -24,3 +27,35 @@ class AveragePipeline:
         self.logger.info('Minimum rating: {}'.format(min(self.ratings)))
         self.logger.info('Maximum rating: {}'.format(max(self.ratings)))
         self.logger.info('Average rating: {}'.format(sum(self.ratings)/len(self.ratings)))
+
+
+class ValidateQuotesPipeline:
+    schema = {
+        '$schema': 'http://json-schema.org/draft-07/schema#',
+        '$id': 'http://example.com/product.schema.json',
+        'title': 'Quote',
+        'type': 'object',
+        'properties': {
+            'text': {
+                'type': 'string',
+                'maxLength': 120
+            },
+            'tags': {
+                'type': 'array',
+                'items': {
+                    'type': 'string'
+                },
+                'minItems': 1,
+                'maxItems': 3,
+            }
+        },
+        'additionalProperties': True,
+    }
+
+    def process_item(self, item, spider):
+        try:
+            jsonschema.validate(item, self.schema)
+        except jsonschema.ValidationError as ex:
+            raise DropItem(ex.message)
+        else:
+            return item
