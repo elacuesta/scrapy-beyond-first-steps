@@ -7,7 +7,8 @@ from lxml import etree
 
 class _FakeResponse:
     """
-    zeep.wsdl.bindings.soap.SoapBinding.process_reply expects a requests.models.Response object
+    Duck typing: zeep.wsdl.bindings.soap.SoapBinding.process_reply
+    expects a requests.models.Response object
     """
     def __init__(self, status_code, content, headers):
         self.status_code = status_code
@@ -31,7 +32,7 @@ class TemperatureConversionMiddleware:
         """
         Create the zeep Client using the WSDL from the spider.
         """
-        self.client = ZeepClient('{}?WSDL'.format(spider.url))
+        self.client = ZeepClient('{}?WSDL'.format(spider.url))  # blocking operation
         self.operations = list(self.client.wsdl.bindings.values())[0]
 
     def process_request(self, request, spider):
