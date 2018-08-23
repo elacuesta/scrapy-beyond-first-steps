@@ -9,7 +9,7 @@ import jsonschema
 class BlockingStoragePipeline:
     """
     Optimize a blocking writing operation by returning a Twisted Deferred
-    (imagine the operation could take a long time, like when using a remote database)
+    (imagine the operation could take a long time, like writing a remote database)
     """
     def open_spider(self, spider):
         self.logger = logging.getLogger(self.__class__.__name__)
@@ -17,7 +17,7 @@ class BlockingStoragePipeline:
 
     def process_item(self, item, spider):
         dfd = defer.Deferred()
-        dfd.addBoth(self.write_item)
+        dfd.addCallback(self.write_item)
         reactor.callLater(0, dfd.callback, item)
         return dfd
 
