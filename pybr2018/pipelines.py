@@ -59,7 +59,7 @@ class ValidateQuotesPipeline:
                 'items': {
                     'type': 'string',
                 },
-                'minItems': 1,
+                'minItems': 2,
                 'maxItems': 5,
             }
         },
