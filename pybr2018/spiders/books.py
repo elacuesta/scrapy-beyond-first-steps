@@ -11,11 +11,6 @@ class BooksSpider(scrapy.Spider):
     """
     name = 'books'
     start_urls = ['http://books.toscrape.com']
-    custom_settings = {
-        'ITEM_PIPELINES': {
-            'pybr2018.pipelines.BlockingStoragePipeline': 110,
-        },
-    }
 
     def extract_book_urls(self, response):
         return map(response.urljoin, response.css('article.product_pod h3 a::attr(href)').getall())

@@ -23,8 +23,10 @@ FEED_EXPORTERS = {
     'yml': 'scrapy_yaml_item_exporter.YAMLItemExporter',
 }
 
-USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0'
+EXTENSIONS = {
+    'pybr2018.extensions.BlockingRemoteStorageExtension': 550,
+}
 
-ROBOTSTXT_OBEY = False
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0'
 
 CONCURRENT_REQUESTS = 32

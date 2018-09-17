@@ -1,37 +1,5 @@
-import re
-import logging
-
-from twisted.internet import defer, reactor
 from scrapy.exceptions import DropItem
 import jsonschema
-
-
-class BlockingStoragePipeline:
-    """
-    Optimize a blocking writing operation by returning a Twisted Deferred
-    (imagine the operation could take a long time, like writing a remote database)
-    """
-    def open_spider(self, spider):
-        self.logger = logging.getLogger(self.__class__.__name__)
-        self.file = open('{}_items.txt'.format(spider.name), 'w')
-
-    def process_item(self, item, spider):
-        dfd = defer.Deferred()
-        dfd.addCallback(self.write_item)
-        reactor.callLater(0, dfd.callback, item)
-        return dfd
-
-    def write_item(self, item):
-        self.logger.info('Writing to a remote destination: %s', self.file.name)
-        row = ', '.join([
-            '{}: {}'.format(key, value) for key, value in
-            sorted(dict(item).items(), key=lambda elem: elem[0])
-        ])
-        self.file.write(row + '\n')
-        return item
-
-    def close_spider(self, spider):
-        self.file.close()
 
 
 class ValidateQuotesPipeline:
