@@ -4,9 +4,9 @@ from twisted.internet import defer, reactor
 from scrapy import signals
 
 
-class BlockingRemoteStorageExtension:
+class RemoteStorageExtension:
     """
-    Write items to a remote storage server.
+    Write items to a remote storage server (Proof of concept, write to file instead).
     Optimize blocking operations by returning Twisted Deferreds
     (imagine the operations could take a long time)
     """
@@ -21,7 +21,7 @@ class BlockingRemoteStorageExtension:
         return ext
 
     def spider_opened(self, spider):
-        self.logger = logging.getLogger(self.__class__.__name__)
+        self.logger.info('Writing items to a remote location')
         self.file = open('{}_items.txt'.format(spider.name), 'w')
 
     def item_scraped(self, item, response, spider):

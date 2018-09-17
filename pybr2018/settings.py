@@ -24,7 +24,7 @@ FEED_EXPORTERS = {
 }
 
 EXTENSIONS = {
-    'pybr2018.extensions.BlockingRemoteStorageExtension': 550,
+    'pybr2018.extensions.RemoteStorageExtension': 550,
 }
 
 USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10.13; rv:62.0) Gecko/20100101 Firefox/62.0'

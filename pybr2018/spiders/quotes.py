@@ -20,8 +20,7 @@ class QuotesSpider(scrapy.Spider):
                 'url': response.url,
                 'author': quote.css('small.author::text').get(),
                 'text': quote.css('span.text::text').get(),
+                'tags': quote.css('meta.keywords::attr(content)').get('').split(','),
             }
-            tags = quote.css('meta.keywords::attr(content)')
-            if tags:
-                item['tags'] = tags.get().split(',')
+            item['tags'] = list(filter(None, item['tags']))
             yield item
