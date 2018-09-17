@@ -13,7 +13,6 @@ class BooksSpider(scrapy.Spider):
     start_urls = ['http://books.toscrape.com']
     custom_settings = {
         'ITEM_PIPELINES': {
-            'pybr2018.pipelines.AveragePipeline': 100,
             'pybr2018.pipelines.BlockingStoragePipeline': 110,
         },
     }
