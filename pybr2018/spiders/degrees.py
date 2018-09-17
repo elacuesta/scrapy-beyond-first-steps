@@ -9,7 +9,7 @@ class DegreesSpider(Spider):
     url = 'https://www.w3schools.com/xml/tempconvert.asmx'
     custom_settings = {
         'DOWNLOADER_MIDDLEWARES': {
-           'pybr2018.downloader_middlewares.temperature.TemperatureConversionMiddleware': 543,
+           'pybr2018.middlewares.temperature.TemperatureConversionMiddleware': 543,
         }
     }
 

@@ -15,8 +15,8 @@ class QuotesSpider(scrapy.Spider):
     ]
     custom_settings = {
         'DOWNLOADER_MIDDLEWARES': {
-           'pybr2018.downloader_middlewares.quotes.DecompressZipMiddleware': 543,
-           'pybr2018.downloader_middlewares.quotes.DecodeBase64Middleware': 542,
+           'pybr2018.middlewares.quotes.DecompressZipMiddleware': 543,
+           'pybr2018.middlewares.quotes.DecodeBase64Middleware': 542,
         },
         # 'ITEM_PIPELINES': {'pybr2018.pipelines.ValidateQuotesPipeline': 100},
     }
