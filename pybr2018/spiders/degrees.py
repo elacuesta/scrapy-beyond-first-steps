@@ -29,10 +29,8 @@ class DegreesSpider(Spider):
         yield self.make_request('FahrenheitToCelsius', 10)
 
     def parse(self, response):
-        source, destination = response.meta['operation_name'].split('To')
+        source_unit, destination_unit = response.meta['operation_name'].split('To')
         return {
-            'source_unit': source,
-            'destination_unit': destination,
-            'source_value': response.meta['source_value'],
-            'destination_value': response.meta['result'],
+            'source': '{} {}'.format(response.meta['source_value'], source_unit),
+            'destination': '{} {}'.format(response.meta['result'], destination_unit),
         }
