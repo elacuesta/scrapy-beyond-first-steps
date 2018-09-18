@@ -1,11 +1,13 @@
-from scrapy import Spider, Request
+import random
+
+import scrapy
 
 
-class DegreesSpider(Spider):
+class TemperatureSpider(scrapy.Spider):
     """
     A spider that converts from Celsius to Fahrenheit and vice-versa using an external SOAP service
     """
-    name = 'degrees'
+    name = 'temperature'
     url = 'https://www.w3schools.com/xml/tempconvert.asmx'
     custom_settings = {
         'DOWNLOADER_MIDDLEWARES': {
@@ -13,22 +15,14 @@ class DegreesSpider(Spider):
         }
     }
 
-    def make_request(self, operation_name, source_value):
-        return Request(
-            url=self.url,
-            dont_filter=True,
-            meta={'source_value': source_value, 'operation_name': operation_name},
-        )
-
     def start_requests(self):
-        yield self.make_request('CelsiusToFahrenheit', 0)
-        yield self.make_request('CelsiusToFahrenheit', 1)
-        yield self.make_request('CelsiusToFahrenheit', 15.6)
-        yield self.make_request('FahrenheitToCelsius', 100)
-        yield self.make_request('FahrenheitToCelsius', 451)
-        yield self.make_request('FahrenheitToCelsius', 10)
+        for operation in ('CelsiusToFahrenheit', 'FahrenheitToCelsius'):
+            for _ in range(5):
+                meta = {'operation_name': operation, 'source_value': random.uniform(0, 50)}
+                yield scrapy.Request(self.url, dont_filter=True, meta=meta)
 
     def parse(self, response):
+        # scrapy.shell.inspect_response(response, self)
         source_unit, destination_unit = response.meta['operation_name'].split('To')
         return {
             'source': '{} {}'.format(response.meta['source_value'], source_unit),
