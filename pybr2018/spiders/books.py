@@ -32,8 +32,7 @@ class SequentialBooksSpider(BooksSpider):
     A spider that schedules and processes requests/responses sequentially
     """
     name = 'books-sequential'
-
-    pending_book_urls = []
+    pending = []
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -42,11 +41,15 @@ class SequentialBooksSpider(BooksSpider):
         return spider
 
     def schedule_request(self):
-        if self.pending_book_urls:
-            book_url = self.pending_book_urls.pop()
-            self.logger.info('Scheduling: %s', book_url)
-            request = scrapy.Request(book_url, callback=self.parse_book)
+        if self.pending:
+            request = self.pending.pop()
+            self.logger.info('Scheduling: %s', request.url)
             self.crawler.engine.crawl(request, self)
 
     def parse(self, response):
-        self.pending_book_urls.extend(self.extract_book_urls(response))
+        for book_url in self.extract_book_urls(response):
+            self.pending.append(scrapy.Request(book_url, callback=self.parse_book))
+            self.pending.append(response.request.replace(dont_filter=True, callback=self.parse_dummy))
+
+    def parse_dummy(self, response):
+        self.logger.info('Back at the main page')
