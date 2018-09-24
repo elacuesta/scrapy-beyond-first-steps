@@ -42,7 +42,7 @@ class SequentialBooksSpider(BooksSpider):
 
     def schedule_request(self):
         if self.pending:
-            request = self.pending.pop()
+            request = self.pending.pop(0)
             self.logger.info('Scheduling: %s', request.url)
             self.crawler.engine.crawl(request, self)
 
