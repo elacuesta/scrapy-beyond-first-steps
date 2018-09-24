@@ -10,8 +10,6 @@ class QuotesSpider(scrapy.Spider):
     ]
     custom_settings = {
         'ITEM_PIPELINES': {'pybr2018.pipelines.ValidateQuotesPipeline': 100},
-        'FEED_FORMAT': 'yaml',
-        'FEED_URI': 'quotes.yaml',
     }
 
     def parse(self, response):
@@ -20,7 +18,7 @@ class QuotesSpider(scrapy.Spider):
                 'url': response.url,
                 'author': quote.css('small.author::text').get(),
                 'text': quote.css('span.text::text').get(),
-                'tags': quote.css('meta.keywords::attr(content)').get('').split(','),
+                'tags': quote.css('meta.keywords::attr(content)').get() or '',
             }
-            item['tags'] = list(filter(None, item['tags']))
+            item['tags'] = list(filter(None, item['tags'].split(',')))
             yield item
