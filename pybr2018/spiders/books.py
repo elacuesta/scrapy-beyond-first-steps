@@ -1,8 +1,8 @@
 # -*- coding: utf-8 -*-
-import scrapy
+from scrapy import Spider, Request, signals
 
 
-class BooksSpider(scrapy.Spider):
+class BooksSpider(Spider):
     """
     Base spider with common methods to extract links and book data
     """
@@ -15,7 +15,7 @@ class BooksSpider(scrapy.Spider):
     def parse(self, response):
         for book_url in self.extract_book_urls(response):
             self.logger.info('Scheduling: %s', book_url)
-            yield scrapy.Request(book_url, callback=self.parse_book)
+            yield Request(book_url, callback=self.parse_book)
 
     def parse_book(self, response):
         self.logger.info('Extracting: %s', response.url)
@@ -37,7 +37,7 @@ class SequentialBooksSpider(BooksSpider):
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
         spider = super().from_crawler(crawler, *args, **kwargs)
-        crawler.signals.connect(spider.schedule_request, signal=scrapy.signals.spider_idle)
+        crawler.signals.connect(spider.schedule_request, signal=signals.spider_idle)
         return spider
 
     def schedule_request(self):
@@ -48,7 +48,7 @@ class SequentialBooksSpider(BooksSpider):
 
     def parse(self, response):
         for book_url in self.extract_book_urls(response):
-            self.pending.append(scrapy.Request(book_url, callback=self.parse_book))
+            self.pending.append(Request(book_url, callback=self.parse_book))
             self.pending.append(response.request.replace(dont_filter=True, callback=self.parse_dummy))
 
     def parse_dummy(self, response):
