@@ -1,6 +1,6 @@
 import logging
 
-from twisted.internet import defer, reactor
+from twisted.internet.threads import deferToThread
 from scrapy import signals
 
 
@@ -25,10 +25,7 @@ class RemoteStorageExtension:
         self.file = open('{}_items.txt'.format(spider.name), 'w')
 
     def item_scraped(self, item, response, spider):
-        dfd = defer.Deferred()
-        dfd.addCallback(self._write_item)
-        reactor.callLater(0, dfd.callback, item)
-        return dfd
+        return deferToThread(self._write_item, item)
 
     def _write_item(self, item):
         row = ', '.join([
