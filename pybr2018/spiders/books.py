@@ -9,6 +9,12 @@ class BooksSpider(Spider):
     name = 'books'
     start_urls = ['http://books.toscrape.com']
 
+    custom_settings = {
+        'SPIDER_MIDDLEWARES': {
+            'pybr2018.middlewares.books.BookCacheSpiderMiddleware': 543,
+        }
+    }
+
     def extract_book_urls(self, response):
         return map(response.urljoin, response.css('article.product_pod h3 a::attr(href)').getall())
 
@@ -49,7 +55,7 @@ class SequentialBooksSpider(BooksSpider):
     def parse(self, response):
         for book_url in self.extract_book_urls(response):
             self.pending.append(Request(book_url, callback=self.parse_book))
-            self.pending.append(response.request.replace(dont_filter=True, callback=self.parse_dummy))
+            self.pending.append(response.request.replace(dont_filter=True, callback=self.parse_dummy))  # noqa
 
     def parse_dummy(self, response):
         self.logger.info('Back at the main page')
