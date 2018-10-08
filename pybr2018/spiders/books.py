@@ -12,6 +12,9 @@ class BooksSpider(Spider):
     # custom_settings = {
     #     'SPIDER_MIDDLEWARES': {
     #         'pybr2018.middlewares.books.BookCacheSpiderMiddleware': 543,
+    #     },
+    #     'ITEM_PIPELINES': {
+    #         'pybr2018.pipelines.ValidateBookPipeline': 100,
     #     }
     # }
 
