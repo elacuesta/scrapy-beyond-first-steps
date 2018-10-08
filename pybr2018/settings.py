@@ -19,8 +19,7 @@ LOG_LEVEL = 'INFO'
 FEED_EXPORT_INDENT = 4
 FEED_EXPORT_ENCODING = 'utf8'
 FEED_EXPORTERS = {
-    'yaml': 'scrapy_yaml_item_exporter.YAMLItemExporter',
-    'yml': 'scrapy_yaml_item_exporter.YAMLItemExporter',
+    'yaml': 'pybr2018.exporters.YAMLItemExporter',
 }
 
 EXTENSIONS = {
