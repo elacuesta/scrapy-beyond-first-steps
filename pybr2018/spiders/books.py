@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from scrapy import Spider, Request, signals
+from scrapy import Spider, signals
 
 
 class BooksSpider(Spider):
@@ -9,19 +9,16 @@ class BooksSpider(Spider):
     name = 'books'
     start_urls = ['http://books.toscrape.com']
 
-    custom_settings = {
-        'SPIDER_MIDDLEWARES': {
-            'pybr2018.middlewares.books.BookCacheSpiderMiddleware': 543,
-        }
-    }
-
-    def extract_book_urls(self, response):
-        return map(response.urljoin, response.css('article.product_pod h3 a::attr(href)').getall())
+    # custom_settings = {
+    #     'SPIDER_MIDDLEWARES': {
+    #         'pybr2018.middlewares.books.BookCacheSpiderMiddleware': 543,
+    #     }
+    # }
 
     def parse(self, response):
-        for book_url in self.extract_book_urls(response):
-            self.logger.info('Scheduling: %s', book_url)
-            yield Request(book_url, callback=self.parse_book)
+        for book_link in response.css('article.product_pod h3 a::attr(href)').getall():
+            self.logger.info('Scheduling: %s', book_link)
+            yield response.follow(book_link, callback=self.parse_book)
 
     def parse_book(self, response):
         self.logger.info('Extracting: %s', response.url)
@@ -53,8 +50,8 @@ class SequentialBooksSpider(BooksSpider):
             self.crawler.engine.crawl(request, self)
 
     def parse(self, response):
-        for book_url in self.extract_book_urls(response):
-            self.pending.append(Request(book_url, callback=self.parse_book))
+        for book_link in response.css('article.product_pod h3 a::attr(href)').getall():
+            self.pending.append(response.follow(book_link, callback=self.parse_book))
             self.pending.append(response.request.replace(dont_filter=True, callback=self.parse_dummy))  # noqa
 
     def parse_dummy(self, response):
