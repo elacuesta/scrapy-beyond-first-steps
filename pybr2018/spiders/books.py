@@ -25,8 +25,7 @@ class BooksSpider(Spider):
         return {
             'url': response.url,
             'title': response.css('h1::text').get(),
-            'price': response.css('p.price_color::text').get(),
-            'rating': response.css('p.star-rating::attr(class)').get('').split()[-1],
+            'price': float(response.css('p.price_color::text').re_first(r'(\d+.?\d*)')),
         }
 
 

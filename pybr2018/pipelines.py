@@ -2,37 +2,28 @@ from scrapy.exceptions import DropItem
 import jsonschema
 
 
-class ValidateQuotesPipeline:
-    """
-    Validate each item with JSON Schema
-    """
+class ValidateBookPipeline:
     schema = {
         '$schema': 'http://json-schema.org/draft-07/schema#',
         '$id': 'http://example.com/product.schema.json',
-        'title': 'Quote',
+        'title': 'Book',
         'type': 'object',
         'properties': {
             'url': {
                 'type': 'string',
             },
-            'author': {
+            'title': {
                 'type': 'string',
+                'maxLength': 80,
             },
-            'text': {
-                'type': 'string',
-                'maxLength': 200,
+            'price': {
+                'type': 'number',
+                'minimum': 20,
+                'maximum': 50,
             },
-            'tags': {
-                'type': 'array',
-                'items': {
-                    'type': 'string',
-                },
-                'minItems': 2,
-                'maxItems': 5,
-            }
         },
         'additionalProperties': True,
-        'required': ['url', 'author', 'text', 'tags'],
+        'required': ['url', 'title', 'price'],
     }
 
     def process_item(self, item, spider):
