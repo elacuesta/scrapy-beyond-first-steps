@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+from collections import deque
 from scrapy import Spider, signals
 
 
@@ -9,14 +10,14 @@ class BooksSpider(Spider):
     name = 'books'
     start_urls = ['http://books.toscrape.com']
 
-    # custom_settings = {
-    #     'SPIDER_MIDDLEWARES': {
-    #         'pybr2018.middlewares.books.BookCacheSpiderMiddleware': 543,
-    #     },
-    #     'ITEM_PIPELINES': {
-    #         'pybr2018.pipelines.ValidateBookPipeline': 100,
-    #     }
-    # }
+    custom_settings = {
+        'SPIDER_MIDDLEWARES': {
+            'pybr2018.middlewares.books.BookCacheSpiderMiddleware': 543,
+        },
+        'ITEM_PIPELINES': {
+            'pybr2018.pipelines.ValidateBookPipeline': 100,
+        }
+    }
 
     def parse(self, response):
         for book_link in response.css('article.product_pod h3 a::attr(href)').getall():
@@ -37,7 +38,7 @@ class SequentialBooksSpider(BooksSpider):
     A spider that schedules and processes requests/responses sequentially
     """
     name = 'books-sequential'
-    pending = []
+    pending = deque()
 
     @classmethod
     def from_crawler(cls, crawler, *args, **kwargs):
@@ -47,7 +48,7 @@ class SequentialBooksSpider(BooksSpider):
 
     def schedule_request(self):
         if self.pending:
-            request = self.pending.pop(0)
+            request = self.pending.popleft()
             self.logger.info('Scheduling: %s', request.url)
             self.crawler.engine.crawl(request, self)
 
