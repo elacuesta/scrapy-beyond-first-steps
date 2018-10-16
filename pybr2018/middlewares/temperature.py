@@ -1,8 +1,8 @@
 import logging
 
-from zeep import Client as ZeepClient
+import zeep
+import lxml
 from scrapy import signals, Request
-from lxml import etree
 
 
 class _FakeResponse:
@@ -32,7 +32,7 @@ class TemperatureConversionMiddleware:
         """
         Create the zeep Client using the WSDL from the spider.
         """
-        self.client = ZeepClient('{}?WSDL'.format(spider.url))  # blocking operation
+        self.client = zeep.Client('{}?WSDL'.format(spider.url))  # blocking operation
         self.operations = list(self.client.wsdl.bindings.values())[0]
 
     def process_request(self, request, spider):
@@ -55,7 +55,7 @@ class TemperatureConversionMiddleware:
                     'Content-Type': 'text/xml; charset=utf-8',
                     'SOAPAction': operation.soapaction,
                 },
-                body=etree.tostring(body),
+                body=lxml.etree.tostring(body),
                 dont_filter=True,
                 meta={'zeep_ignore': True, **request.meta},
             )
