@@ -36,6 +36,11 @@ class BooksSpider(Spider):
 class SequentialBooksSpider(BooksSpider):
     """
     A spider that schedules and processes requests/responses sequentially
+
+    Disclaimer:
+    While this works well in most situations, it might require additional work for large crawls.
+    Requests are stored in memory in the Spider instance, they do not get serialized to the disk
+    and memory queues.
     """
     name = 'books-sequential'
     pending = deque()
