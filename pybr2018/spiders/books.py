@@ -16,7 +16,7 @@ class BooksSpider(Spider):
         },
         'ITEM_PIPELINES': {
             'pybr2018.pipelines.ValidateBookPipeline': 100,
-        }
+        },
     }
 
     def parse(self, response):
@@ -36,31 +36,20 @@ class BooksSpider(Spider):
 class SequentialBooksSpider(BooksSpider):
     """
     A spider that schedules and processes requests/responses sequentially
-
-    Disclaimer:
-    While this works well in most situations, it might require additional work for large crawls.
-    Requests are stored in memory in the Spider instance, they do not get serialized to the disk
-    and memory queues.
     """
     name = 'books-sequential'
-    pending = deque()
 
-    @classmethod
-    def from_crawler(cls, crawler, *args, **kwargs):
-        spider = super().from_crawler(crawler, *args, **kwargs)
-        crawler.signals.connect(spider.schedule_request, signal=signals.spider_idle)
-        return spider
-
-    def schedule_request(self):
-        if self.pending:
-            request = self.pending.popleft()
-            self.logger.info('Scheduling: %s', request.url)
-            self.crawler.engine.crawl(request, self)
+    custom_settings = {
+        'SCHEDULER': 'pybr2018.scheduler.SequentialScheduler',
+        'SCHEDULER_DISK_QUEUE': 'scrapy.squeues.PickleFifoDiskQueue',
+        'SCHEDULER_MEMORY_QUEUE': 'scrapy.squeues.FifoMemoryQueue',
+    }
 
     def parse(self, response):
-        for book_link in response.css('article.product_pod h3 a::attr(href)').getall():
-            self.pending.append(response.follow(book_link, callback=self.parse_book))
-            self.pending.append(response.request.replace(dont_filter=True, callback=self.parse_dummy))  # noqa
+        for book_link in response.css('article.product_pod h3 a::attr(href)'):
+            self.logger.info('Yielding request: %s', book_link.get())
+            yield response.follow(book_link, callback=self.parse_book)
+            yield response.request.replace(dont_filter=True, callback=self.parse_dummy)
 
     def parse_dummy(self, response):
         self.logger.info('Back at the main page')
